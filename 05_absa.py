@@ -4,7 +4,7 @@ import torch
 import json
 
 # CSV laden
-df = pd.read_csv("cleaned_thm_reviews.csv")
+df = pd.read_csv("03_clean_reviews/frauas_reviews.csv")
 
 # Lade ABSA-Modell
 aspect_extractor = ATEPCCheckpointManager.get_aspect_extractor(
@@ -41,5 +41,5 @@ for entry in output:
         })
 
 df_flat = pd.DataFrame(flat_data)
-df_flat.to_csv("absa_aspects_thm.csv", index=False, encoding="utf-8")
+df_flat.to_csv("04_absa_files/absa_aspects_frauas.csv", index=False, encoding="utf-8")
 print("✅ ABSA-Ergebnisse gespeichert in absa_aspects.csv")
