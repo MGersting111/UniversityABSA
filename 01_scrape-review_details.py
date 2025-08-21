@@ -20,7 +20,7 @@ def extract_review_data(url, rating_id):
     try:
         res = requests.get(url, headers=HEADERS, timeout=10)
         if res.status_code != 200:
-            print(f"❌ Fehler bei {url} – Status {res.status_code}")
+            print(f"Fehler bei {url} – Status {res.status_code}")
             return None
 
         soup = BeautifulSoup(res.text, "html.parser")
@@ -85,7 +85,7 @@ def extract_review_data(url, rating_id):
         }
 
     except Exception as e:
-        print(f"❌ Fehler bei {url}: {e}")
+        print(f"Fehler bei {url}: {e}")
         return None
 
 
@@ -96,7 +96,7 @@ def main():
         links = [line.strip() for line in f if line.strip()]
 
     for idx, url in enumerate(links, start=1):  # Für Tests nur 5
-        print(f"🔍 Review {idx}/{len(links)}: {url}")
+        print(f"Review {idx}/{len(links)}: {url}")
         data = extract_review_data(url, rating_id=idx)
         if data:
             results.append(data)
@@ -104,7 +104,7 @@ def main():
 
     df = pd.DataFrame(results)
     df.to_csv(OUTPUT_FILE, index=False, encoding="utf-8")
-    print(f"\n✅ Fertig! {len(df)} Bewertungen gespeichert in {OUTPUT_FILE}")
+    print(f"Fertig! {len(df)} Bewertungen gespeichert in {OUTPUT_FILE}")
 
 
 if __name__ == "__main__":

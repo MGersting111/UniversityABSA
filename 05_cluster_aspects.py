@@ -4,6 +4,8 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 import pandas as pd
 from sentence_transformers import SentenceTransformer
 
+INPUT_FILE = ""
+OUTPUT_FILE = ""
 
 
 # Lade ABSA-Daten
@@ -50,4 +52,4 @@ df_merged = pd.merge(df, clustered, on="aspect", how="left")
 
 # Speichern
 df_merged.to_csv("absa_reviews_with_clusters_thm.csv", index=False)
-print("✅ Reviews mit Clustern und automatisch benannten Gruppen gespeichert in absa_reviews_with_clusters.csv")
+print("Reviews mit Clustern und automatisch benannten Gruppen gespeichert in absa_reviews_with_clusters.csv")

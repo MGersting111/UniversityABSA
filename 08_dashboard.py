@@ -2,7 +2,7 @@ import streamlit as st
 import pandas as pd
 
 # CSV laden
-df = pd.read_csv("06_final_csv/full_absa_dataset.csv", parse_dates=["date"], dayfirst=True)
+df = pd.read_csv("06_final_csv/hybrid_final.csv", parse_dates=["date"], dayfirst=True)
 
 # --- Sidebar-Filter ---
 st.sidebar.header("🔍 Filter")
@@ -33,20 +33,20 @@ filtered_df = df[
 ]
 
 # --- Dashboard Titel ---
-st.title("🎓 Uni-Review Dashboard (ABSA-basiert)")
+st.title("Uni-Review Dashboard (ABSA-basiert)")
 
 # --- Durchschnittliches Rating ---
-st.header("📈 Durchschnittliches Rating pro Universität")
+st.header("Durchschnittliches Rating pro Universität")
 avg_rating = filtered_df.groupby("university")["rating"].mean()
 st.bar_chart(avg_rating)
 
 # --- Bewertung über Zeit ---
-st.header("📆 Entwicklung der Bewertungen über Zeit")
+st.header("Entwicklung der Bewertungen über Zeit")
 time_rating = filtered_df.groupby(["date", "university"])["rating"].mean().unstack()
 st.line_chart(time_rating)
 
 # --- Aspekte ---
-st.header("📚 Aspekte im Vergleich")
+st.header("Aspekte im Vergleich")
 aspect_cols = [
     "Studieninhalte", "Dozenten", "Lehrveranstaltungen", "Ausstattung",
     "Organisation", "Literaturzugang", "Digitales Studieren"
@@ -55,15 +55,15 @@ aspect_avg = filtered_df.groupby("university")[aspect_cols].mean()
 st.bar_chart(aspect_avg)
 
 # --- Sentiment-Verteilung ---
-st.header("💬 Sentiment-Verteilung")
+st.header("Sentiment-Verteilung")
 sentiment_count = filtered_df.groupby(["sentiment", "university"]).size().unstack(fill_value=0)
 st.bar_chart(sentiment_count)
 
 # --- Cluster-Verteilung ---
-st.header("🧠 Cluster-Verteilung")
+st.header("Cluster-Verteilung")
 cluster_count = filtered_df.groupby(["cluster_name", "university"]).size().unstack(fill_value=0)
 st.bar_chart(cluster_count)
 
 # --- Optional: Rohdaten anzeigen ---
-with st.expander("🔎 Rohdaten anzeigen"):
+with st.expander("Rohdaten anzeigen"):
     st.dataframe(filtered_df)

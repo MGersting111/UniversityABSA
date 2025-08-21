@@ -2,7 +2,7 @@ import pandas as pd
 import spacy
 import torch
 import torch.nn.functional as F
-from transformers import AutoTokenizer, AutoModelForSequenceClassification, pipeline
+from transformers import AutoTokenizer, AutoModelForSequenceClassification
 
 # Lade ABSA-Modell
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -13,17 +13,15 @@ absa_model = AutoModelForSequenceClassification.from_pretrained(
 ).to(device)
 absa_model.eval()
 
-
-
 # Lade deutsches spaCy-Modell
 nlp = spacy.load("de_core_news_md")
 STOPWORDS = nlp.Defaults.stop_words
 BLACKLIST = {"zeit", "sache", "teil", "thema", "jahr", "name", "dinge", "meinung"}
 
 # Lade Reviews
-df = pd.read_csv("03_clean_reviews/tu_darmstadt_reviews.csv")
+df = pd.read_csv("03_clean_reviews/frauas_reviews.csv")
 
-# Aspekte extrahieren (nur Nomen + evtl. ADJ davor)
+# Aspekte extrahieren
 def extract_aspects(text):
     doc = nlp(text)
     aspects = set()
@@ -47,20 +45,31 @@ def predict_absa(aspect, sentence):
     labels = ["Negative", "Neutral", "Positive"]
     return labels[torch.argmax(probs).item()]
 
-# Hauptpipeline
 output = []
+review_id = 1
+
 for _, row in df.iterrows():
     review = str(row["text_clean"])
     aspects = extract_aspects(review)
-    for asp in aspects:
-        sentiment = predict_absa(asp, review)
+
+    if aspects:  # Falls Aspekte gefunden wurden
+        for asp in aspects:
+            sentiment = predict_absa(asp, review)
+            output.append({
+                "id": review_id,
+                "review": review,
+                "aspect": asp,
+                "sentiment": sentiment
+            })
+    else:  # Falls keine Aspekte gefunden wurden
         output.append({
+            "id": review_id,
             "review": review,
-            "aspect": asp,
-            "sentiment": sentiment
+            "aspect": None,
+            "sentiment": None
         })
 
-# Speichern
+    review_id += 1
+
 df_out = pd.DataFrame(output)
-df_out.to_csv("04_absa_files/tu_darmstadt_absa_aspects.csv", index=False, encoding="utf-8")
-print("✅ ABSA-Ergebnisse gespeichert in 04_absa_files/tu_darmstadt_absa_aspects.csv")
+df_out.to_csv("04.1_absa_files_hybrid/hybrid_fra_uas_absa_aspects.csv", index=False, encoding="utf-8")

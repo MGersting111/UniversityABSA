@@ -6,23 +6,20 @@ from sklearn.feature_extraction.text import CountVectorizer
 import numpy as np
 import spacy
 
-# === Einstellungen ===
-CSV_INPUT = "04_absa_files/tu_darmstadt_absa_aspects.csv"
-CSV_OUTPUT = "05_absa_clustered/tu_darmstadt_absa_reviews_clustered.csv"
+CSV_INPUT = "04.1_absa_files_hybrid/tu_darmstadt_absa_aspects.csv"
+CSV_OUTPUT = "OLD__absa_clustered/tu_darmstadt_absa_reviews_clustered.csv"
 
-# === Lade Daten ===
 df = pd.read_csv(CSV_INPUT, encoding="utf-8")
 aspects = df["aspect"].dropna().unique().tolist()
 
-# === Lade deutsche Stopwords ===
 nlp = spacy.load("de_core_news_md")
 german_stopwords = list(nlp.Defaults.stop_words)
 
-# === Embeddings erzeugen ===
+#Embeddings erzeugen
 model = SentenceTransformer("sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2")
 embeddings = model.encode(aspects, show_progress_bar=True)
 
-# === Beste Clusteranzahl finden ===
+#Beste Clusteranzahl finden
 best_k = 2
 best_score = -1
 for k in range(2, min(21, len(aspects))):
@@ -33,17 +30,17 @@ for k in range(2, min(21, len(aspects))):
         best_score = score
         best_k = k
 
-# === Finales Clustering ===
+#Finales Clustering
 final_model = AgglomerativeClustering(n_clusters=best_k)
 labels = final_model.fit_predict(embeddings)
 
-# === Cluster zuordnen ===
+#Cluster zuordnen
 clustered_df = pd.DataFrame({
     "aspect": aspects,
     "cluster": labels
 })
 
-# === Automatische Benennung ===
+#Automatische Benennung
 cluster_names = {}
 aspects_per_cluster = clustered_df.groupby("cluster")["aspect"].apply(list)
 
@@ -57,9 +54,9 @@ for cluster_id, asp_list in aspects_per_cluster.items():
 
 clustered_df["cluster_name"] = clustered_df["cluster"].map(cluster_names)
 
-# === Merge mit Originaldaten ===
+#Merge mit Originaldaten
 df_merged = pd.merge(df, clustered_df, on="aspect", how="left")
 
-# === Speichern ===
+#Speichern
 df_merged.to_csv(CSV_OUTPUT, index=False, encoding="utf-8")
-print(f"✅ Cluster-Ergebnisse gespeichert in: {CSV_OUTPUT}")
+print(f"Cluster-Ergebnisse gespeichert in: {CSV_OUTPUT}")
