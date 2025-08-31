@@ -1,10 +1,10 @@
 import pandas as pd
 
 # Lade Original-Reviews (text_clean, rating_id, etc.)
-df_cleaned = pd.read_csv("03_clean_reviews/frauas_reviews.csv")
+df_cleaned = pd.read_csv("../03_clean_reviews/frauas_reviews.csv")
 
 # Lade ABSA-Ausgabe (Review, Aspect, Sentiment, Cluster)
-df_clustered = pd.read_csv("Archiv/OLD__absa_clustered/frauas_absa_reviews_clustered.csv")
+df_clustered = pd.read_csv("OLD__absa_clustered/frauas_absa_reviews_clustered.csv")
 
 # Füge alle Reviews mit ABSA-Zuordnung zusammen (auch leere)
 df_final = pd.merge(df_cleaned, df_clustered, how="left", left_on="text_clean", right_on="review")
